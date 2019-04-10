@@ -18,7 +18,7 @@
 // */
 
 const grid = [];
-const GRID_LENGTH = 3;
+const GRID_LENGTH = 5;
 let turn = 'X';
 
 let rowSum = [];
@@ -101,7 +101,6 @@ function updateValidationDataAndCheckFOrWinner(row, col, value) {
 		dig2 += value;
 	}
 
-
 	if (rowSum[row] == GRID_LENGTH * value) {
 		return true;
 	} else if (colSum[col] == GRID_LENGTH * value) {
@@ -131,7 +130,11 @@ function onBoxClick() {
 }
 
 function computerTurn() {
-	let result = false;
+    let result = false;
+    
+    // We can disable cliks on the grid, as well as put delay of about 1 second for computer turn
+    //to do : currently computer just picks the first empty box. But we can turn this into a function where it randomly picks an box from all available boxes.
+    // If want to put intelligence, we can right some kind of huristic algo as well, where computer picks the best possible solution. 
 	for (let colIdx = 0; colIdx < GRID_LENGTH; colIdx++) {
 		let done = 0;
 		for (let rowIdx = 0; rowIdx < GRID_LENGTH; rowIdx++) {
@@ -148,7 +151,8 @@ function computerTurn() {
 	}
 	if (result) {
 		renderMainGrid();
-		window.alert('wineer is Computer');
+        window.alert('wineer is Computer');
+        // Initialise main grid.
 	} else {
 		renderMainGrid();
 		addClickHandlers();
