@@ -18,7 +18,7 @@
 // */
 
 const grid = [];
-const GRID_LENGTH = 5;
+const GRID_LENGTH = 3;
 let turn = 'X';
 
 let rowSum = [];
@@ -97,7 +97,6 @@ function updateValidationDataAndCheckFOrWinner(row, col, value) {
 		dig1 += value;
 	}
 	if (parseInt(row) + parseInt(col) == GRID_LENGTH - 1) {
-		console.log('here');
 		dig2 += value;
 	}
 
@@ -121,38 +120,87 @@ function onBoxClick() {
 	grid[colIdx][rowIdx] = newValue;
 	if (updateValidationDataAndCheckFOrWinner(rowIdx, colIdx, newValue)) {
 		renderMainGrid();
-		window.alert('winner is User');
+		setTimeout(function() {
+			window.alert('winner is Computer');
+		}, 0);
 	} else {
-		computerTurn();
+		computerTurn(rowIdx, colIdx, newValue);
 	}
 	// renderMainGrid();
 	// addClickHandlers();
 }
+// Job of this algo is to make life difficult for user.
+function findOptimalboxForComputer(row, col, userValue, computerValue) {
+	let valueEntered = false;
 
-function computerTurn() {
-    let result = false;
-    
-    // We can disable cliks on the grid, as well as put delay of about 1 second for computer turn
-    //to do : currently computer just picks the first empty box. But we can turn this into a function where it randomly picks an box from all available boxes.
-    // If want to put intelligence, we can right some kind of huristic algo as well, where computer picks the best possible solution. 
-	for (let colIdx = 0; colIdx < GRID_LENGTH; colIdx++) {
-		let done = 0;
-		for (let rowIdx = 0; rowIdx < GRID_LENGTH; rowIdx++) {
-			if (grid[colIdx][rowIdx] == 0) {
-				grid[colIdx][rowIdx] = 2;
-				done = 1;
-				result = updateValidationDataAndCheckFOrWinner(rowIdx, colIdx, 100);
+	if (rowSum[row] == (GRID_LENGTH - 1) * userValue) {
+		for (let index = 0; index < GRID_LENGTH; index++) {
+			if (grid[index][row] == 0) {
+				grid[index][row] = computerValue;
+				valueEntered = true;
+				return [ row, index ];
+			}
+		}
+	}
+	if (!valueEntered && colSum[row] == GRID_LENGTH - 1) {
+		for (let index = 0; index < GRID_LENGTH; index++) {
+			if (grid[col][index] == 0) {
+				grid[col][index] = computerValue;
+				valueEntered = true;
+				return [ index, col ];
+			}
+		}
+	}
+	if (!valueEntered && dig1 == GRID_LENGTH - 1) {
+		for (let index = 0; index < GRID_LENGTH; index++) {
+			if (grid[index][index] == 0) {
+				grid[index][index] = computerValue;
+				valueEntered = true;
+				return [ index, index ];
+			}
+		}
+	}
+	if (!valueEntered && dig2 == GRID_LENGTH - 1) {
+		for (let index = 0; index < GRID_LENGTH; index++) {
+			if (grid[index][GRID_LENGTH - index - 1] == 0) {
+				grid[index][GRID_LENGTH - index - 1] = computerValue;
+				valueEntered = true;
+				return [ GRID_LENGTH - index - 1, index ];
+			}
+		}
+	}
+	if (!valueEntered) {
+		for (let colIdx = 0; colIdx < GRID_LENGTH; colIdx++) {
+			let done = 0;
+			for (let rowIdx = 0; rowIdx < GRID_LENGTH; rowIdx++) {
+				if (grid[colIdx][rowIdx] == 0) {
+					grid[colIdx][rowIdx] = 2;
+					done = 1;
+					return [ rowIdx, colIdx ];
+				}
+			}
+			if (done) {
 				break;
 			}
 		}
-		if (done) {
-			break;
-		}
+	}
+}
+
+function computerTurn(row, col, value) {
+	let result = false;
+
+	// We can disable cliks on the grid, as well as put delay of about 1 second for computer turn.
+	// To Do : If we want to put intelligence, we can right some kind of huristic algo as well, where computer picks the best possible solution.
+	const selectedBoxByComputer = findOptimalboxForComputer(row, col, value, 2);
+	if (selectedBoxByComputer && selectedBoxByComputer.length == 2) {
+		result = updateValidationDataAndCheckFOrWinner(selectedBoxByComputer[0], selectedBoxByComputer[1], 100);
 	}
 	if (result) {
 		renderMainGrid();
-        window.alert('wineer is Computer');
-        // Initialise main grid.
+		setTimeout(function() {
+			window.alert('winner is Computer');
+		}, 0);
+		// Initialise main grid.
 	} else {
 		renderMainGrid();
 		addClickHandlers();
